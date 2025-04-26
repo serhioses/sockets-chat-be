@@ -4,11 +4,11 @@ import { User } from '../models/user.model.js';
 export async function updateProfile(req, res) {
     const avatar = req.file;
 
-    if (!avatar) {
+    if (!Buffer.isBuffer(avatar?.buffer)) {
         return res.status(400).json({ errors: [{ message: 'Avatar is not provided.' }] });
     }
 
-    const { userId } = req.user;
+    const userId = req?.user?.userId;
 
     if (!userId) {
         return res.status(401).json({ errors: [{ message: 'Unauthorized.' }] });

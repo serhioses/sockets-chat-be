@@ -7,6 +7,7 @@ import cors from 'cors';
 import { authRoutes } from './routes/auth.route.js';
 import { connectDB } from './lib/db.js';
 import { profileRoutes } from './routes/profile.route.js';
+import { chatRoutes } from './routes/chat.route.js';
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -19,6 +20,7 @@ app.use(cors({
 }));
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/chat', chatRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
