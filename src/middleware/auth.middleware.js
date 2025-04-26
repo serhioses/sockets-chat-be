@@ -10,9 +10,11 @@ export function protectRoute(req, res, next) {
     try {
         // TODO: refresh token
         const userPayload = jwt.verify(authToken, process.env.JWT_SECRET);
-    } catch(error) {
-        return res.status(401).json({ errors: [{ message: 'Unauthorized.' }] }); 
-    }
 
-    next();
+        req.user = userPayload;
+
+        next();
+    } catch(error) {
+        res.status(500).json({ errors: [{ message: 'Internal server error.' }] }); 
+    }
 }
