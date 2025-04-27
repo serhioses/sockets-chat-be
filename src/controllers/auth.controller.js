@@ -47,11 +47,12 @@ export async function signup(req, res) {
             
         }
 
-        generateToken(newUser._id, res);
-
+        
         await newUser.save();
 
         const userDTO = new UserDTO(newUser);
+        
+        generateToken(userDTO, res);
 
         return res.status(201).json({ data: userDTO });
     } catch (error) {
@@ -95,9 +96,10 @@ export async function login(req, res) {
             return res.status(200).json({ errors: [{ message: 'Invalid credentials.' }] });
         }
 
-        generateToken(userFromDB._id, res);
-
+        
         const userDTO = new UserDTO(userFromDB);
+
+        generateToken(userDTO, res);
 
         return res.status(200).json({ data: userDTO });
     } catch (error) {
