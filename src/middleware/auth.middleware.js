@@ -4,7 +4,7 @@ export function protectRoute(req, res, next) {
     const authToken = req.cookies.auth_token;
     
     if (!authToken) {
-        return res.status(401).json({ errors: [{ message: 'Unauthorized.' }] });
+        return res.status(200).json({ errors: [{ message: 'Unauthorized.' }] });
     }
 
     try {
