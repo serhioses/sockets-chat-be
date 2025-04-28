@@ -1,17 +1,19 @@
+import { UserDTO } from '../dtos/user.dto.js';
 import { cloudinary } from '../lib/cloudinary.js';
+import { generateToken } from '../lib/utils/auth-token.js';
 import { User } from '../models/user.model.js';
 
 export async function updateProfile(req, res) {
     const avatar = req.file;
 
     if (!Buffer.isBuffer(avatar?.buffer)) {
-        return res.status(400).json({ errors: [{ message: 'Avatar is not provided.' }] });
+        return res.status(200).json({ errors: [{ message: 'Avatar is not provided.' }] });
     }
 
-    const userId = req?.user?.userId;
+    const userId = req?.user?.id;
 
     if (!userId) {
-        return res.status(401).json({ errors: [{ message: 'Unauthorized.' }] });
+        return res.status(200).json({ errors: [{ message: 'Unauthorized.' }] });
     }
 
     try {
@@ -30,8 +32,12 @@ export async function updateProfile(req, res) {
             { avatar: uploadResult.secure_url },
             { new: true },
         ).select(['-password', '-updatedAt', '-salt']);
+
+        const userDTO = new UserDTO(updatedUser);
         
-        res.status(200).json({ data: { user: updatedUser } });
+        generateToken(userDTO, res);
+        
+        res.status(200).json({ data: userDTO });
     } catch (error) {
         console.log(error);
         res.status(500).json({ errors: [{ message: 'Internal server error.' }] });
