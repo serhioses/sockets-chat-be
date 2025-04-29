@@ -25,7 +25,7 @@ export async function getChatMessages(req, res) {
     const userId = req?.user?.id;
 
     if (!contactId || !userId) {
-        res.status(400).json({ errors: [{ message: 'Bad request.' }] });
+        res.status(200).json({ errors: [{ message: 'Bad request.' }] });
     }
 
     try {
@@ -36,7 +36,7 @@ export async function getChatMessages(req, res) {
             ],
         });
 
-        res.status(200).json({ data: { messages } });
+        res.status(200).json({ data: messages });
     } catch (error) {
         res.status(500).json({ errors: [{ message: 'Internal server error.' }] });
     }
@@ -101,7 +101,7 @@ export async function sendChatMessage(req, res) {
         await newMessage.save();
 
         // TODO: add realtime
-        res.status(201).json({ data: { newMessage } });
+        res.status(201).json({ data: newMessage });
     } catch (error) {
         res.status(500).json({ errors: [{ message: 'Internal server error.' }] });
     }
