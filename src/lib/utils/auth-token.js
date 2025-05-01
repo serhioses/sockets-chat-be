@@ -7,8 +7,8 @@ export function generateToken(user, res) {
 
     res.cookie('auth_token', token, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'none',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
     });
 
