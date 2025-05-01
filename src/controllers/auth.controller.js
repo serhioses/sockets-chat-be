@@ -34,7 +34,6 @@ export async function signup(req, res) {
 
     try {
         const hashedPassword = await hashPassword(password, salt);
-
         const newUser = new User({
             fullName,
             salt,
@@ -46,7 +45,6 @@ export async function signup(req, res) {
             return res.status(200).json({ errors: [{ message: 'Invalid user data.' }] });
             
         }
-
         
         await newUser.save();
 
@@ -70,12 +68,12 @@ export async function login(req, res) {
     const { success, error } = loginSchema.safeParse({ email, password });
 
     if (!success) {
-    const { fieldErrors, formErrors } = error.flatten();
-
+        const { fieldErrors, formErrors } = error.flatten();
         const allErrors = [
             ...Object.values(fieldErrors).flat().filter(Boolean),
             ...formErrors,
         ];
+
         return res.status(200).json({ formErrors: allErrors });
     }
 
@@ -95,7 +93,6 @@ export async function login(req, res) {
         if (!isPasswordValid) {
             return res.status(200).json({ errors: [{ message: 'Invalid credentials.' }] });
         }
-
         
         const userDTO = new UserDTO(userFromDB);
 
