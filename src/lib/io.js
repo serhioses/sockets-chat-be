@@ -72,7 +72,15 @@ io.on('connection', (socket) => {
     });
 
     socket.on('joinRoom', (id) => {
-        socket.leave(Array.from(socket.rooms).at(0));
+        // TODO: fix leaving rooms
+        // const roomsToLeave = Array.from(socket.rooms).filter((roomName) => {
+        //     return roomName !== socket.id && roomName !== socket.data?.user?.id;
+        // });
+        // if (roomsToLeave.length) {
+        //     roomsToLeave.forEach((roomName) => {
+        //         socket.leave(roomName);
+        //     });
+        // }
 
         if (typeof id === 'string' && id) {
             socket.join(id);
@@ -118,8 +126,8 @@ io.on('connection', (socket) => {
                 });
         
                 await newMessage.save();
-        
-                // TODO: add realtime
+
+                console.log(socket.rooms, userId);
                 io.to(userId).emit('message', { data: newMessage });
             } catch (error) {
                 console.log('Server message error:', error);
