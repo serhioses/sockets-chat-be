@@ -55,52 +55,51 @@ io.use((socket, next) => {
     }
 });
 
-const onlineUserIds = new Set();
+const onlineUserIds = {};
 
 io.on('connection', (socket) => {
     const userId = socket.handshake.query.userId;
 
     if (typeof userId === 'string' && userId) {
-        onlineUserIds.add(userId);
-        socket.join(userId);
+        onlineUserIds[userId] = socket.id;
+        // socket.join(userId);
     }
-    io.emit('getOnlineUsers', Array.from(onlineUserIds));
+    io.emit('getOnlineUsers', Object.keys(onlineUserIds));
 
     socket.on('disconnect', () => {
-        onlineUserIds.delete(userId);
-        io.emit('getOnlineUsers', Array.from(onlineUserIds));
+        delete onlineUserIds[userId];
+        io.emit('getOnlineUsers', Object.keys(onlineUserIds));
     });
 
-    socket.on('joinRoom', (id) => {
-        // TODO: fix leaving rooms
-        // const roomsToLeave = Array.from(socket.rooms).filter((roomName) => {
-        //     return roomName !== socket.id && roomName !== socket.data?.user?.id;
-        // });
-        // if (roomsToLeave.length) {
-        //     roomsToLeave.forEach((roomName) => {
-        //         socket.leave(roomName);
-        //     });
-        // }
+    socket.on('joinRoom', (receiverId) => {
+        socket.leave(Array.from(socket.rooms).at(1));
 
-        if (typeof id === 'string' && id) {
-            socket.join(id);
+        if (typeof receiverId === 'string' && receiverId) {
+            const chatId = [receiverId, userId].sort().join('-');
+            socket.join(chatId);
         }
     });
 
-    socket.on('message', async (data = {}, receiverId) => {
+    socket.on('message', async (data = {}, receiverId, cb) => {
         console.log('server received message:', data);
         const { text, image } = data;
-            const userId = socket.data?.user?.id;
         
             if (!receiverId || !userId) {
-                return io.to(userId).emit('message', { error: 'Bad request.' });
+                // return io.to(userId).emit('message', { error: 'Bad request.' });
+                return cb({ errors: [{ message: 'Bad request.' }] });
             }
         
             const { success, error } = sendMessageSchema.safeParse({ text, image });
         
             if (!success) {
+                const { fieldErrors, formErrors } = error.flatten();
+                const allErrors = [
+                    ...Object.values(fieldErrors).flat().filter(Boolean),
+                    ...formErrors,
+                ];
                 // return res.status(400).json({ formErrors: error.flatten() });
-                return io.to(userId).emit('message', { error: 'Invalid fields.' });
+                // return io.to(userId).emit('message', { error: 'Invalid fields.' });
+                return cb({ formErrors: allErrors });
             }
         
             try {
@@ -127,11 +126,19 @@ io.on('connection', (socket) => {
         
                 await newMessage.save();
 
-                console.log(socket.rooms, userId);
-                io.to(userId).emit('message', { data: newMessage });
+                // console.log(socket.rooms, userId);
+                // const socketReceiver = onlineUserIds[receiverId];
+                // if (socketReceiver) {
+                //     io.to(socketReceiver).emit('message', { data: newMessage });
+                // }
+                const chatId = [receiverId, userId].sort().join('-');
+                socket.to(chatId).emit('message', { data: newMessage });
+
+                cb({ data: newMessage });
             } catch (error) {
                 console.log('Server message error:', error);
-                io.to(userId).emit('message', { error: 'Internal server error.' });
+                // io.to(userId).emit('message', { error: 'Internal server error.' });
+                cb({ errors: [{ message: 'Internal server error.' }] });
             }
     });
 });
