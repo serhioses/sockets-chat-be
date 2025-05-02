@@ -6,7 +6,7 @@ export async function getChatUsers(req, res) {
     const userId = req?.user?.id;
 
     try {
-        const users = await User.find({ _id: { $ne: userId } }).select(['-password', '-updatedAt', '-salt']);
+        const users = await User.find({ _id: { $ne: userId } }).select(['-password', '-updatedAt', '-salt', '-__v']);
 
         const usersDTO = users.map((u) => {
             return new UserDTO(u);

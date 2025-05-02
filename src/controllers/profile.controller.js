@@ -31,7 +31,7 @@ export async function updateProfile(req, res) {
             { _id: userId },
             { avatar: uploadResult.secure_url },
             { new: true },
-        ).select(['-password', '-updatedAt', '-salt']);
+        ).select(['-password', '-updatedAt', '-salt', '-__v']);
 
         const userDTO = new UserDTO(updatedUser);
         
