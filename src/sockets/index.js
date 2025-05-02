@@ -4,8 +4,8 @@ import { server } from '../lib/server.js';
 import { socketAuthMiddleware } from './auth.middleware.js';
 import { handleConnection } from './handlers/connection.handler.js';
 
-export function initSocket(serverInstance = server) {
-    const io = new Server(serverInstance, {
+export function initSocket() {
+    const io = new Server(server, {
         cors: {
             origin: process.env.ALLOWED_ORIGIN,
             credentials: true,
