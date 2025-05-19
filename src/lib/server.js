@@ -19,6 +19,9 @@ app.use(cors({
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/chat', chatRoutes);
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
 
 const server = createServer(app);
 
