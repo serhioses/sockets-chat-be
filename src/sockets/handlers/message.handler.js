@@ -38,10 +38,12 @@ export async function handleMessageEvent(socket, data = {}, receiverId, cb) {
 
     try {
         let uploadResult = null;
+        const folder = process.env.NODE_ENV === 'test' ? '__tests__' : undefined;
+        const tags = process.env.NODE_ENV === 'test' ? ['e2e'] : undefined;
 
         if (image) {
             uploadResult = await new Promise((resolve, reject) => {
-                cloudinary.uploader.upload_stream((error, result) => {
+                cloudinary.uploader.upload_stream({ folder, tags }, (error, result) => {
                     if (error) {
                         return reject(new Error(error.message))
                     };
